@@ -1,74 +1,65 @@
-//DIV TOGGLE
-const toggleButton = document.querySelector('#toggleList');
-const listDiv = document.querySelector('.list');
+const STORE = {
+  items: [
+    {
+      title: 'monkeys',
+      completed: true,
+    },
+    {
+      title: 'bananas',
+      completed: false,
+    },
+  ]
+}
 
-//User INPUT
-const userInput = document.querySelector('.userInput');
-const button = document.querySelector('button.description');
-const p = document.querySelector('p.description');
-let listItem = document.querySelectorAll('li');
+function displayItems() {
+  const html = STORE.items.map((item, index) =>
+    `
+  <li>
+        <span class="
+        shopping-item 
+        ${item.completed ? 'shopping-item__checked' : ''}">${item.title}</span>
+        <div class="shopping-item-controls">
+          <button data-id="${index}" class="shopping-item-toggle">
+            <span class="button-label">check</span>
+          </button>
+          <button class="shopping-item-delete">
+            <span class="button-label">delete</span>
+          </button>
+        </div>
+   </li>
+  `
+  ).join('')
+  jQuery('.shopping-list').html(html)
+}
 
-//ADD ITEM
-const addItemInput = document.querySelector('.addItemInput');
-const addItemButton = document.querySelector('button.addItemButton');
+//start the app
+$(() => {
 
-//Remove Item
-const removeItemButton = document.querySelector('button.removeItemButton');
-  
-//list items 
-const listItems = document.getElementsByTagName('li');
-
-
-toggleButton.addEventListener('click', () => {
-  if (listDiv.style.display == 'none') {
-    listDiv.style.display = 'block';
-    toggleButton.textContent = 'Hide list';
-   } else {
-    listDiv.style.display = 'none';
-    toggleButton.textContent = 'Show list';
-   }
-});
-
-
-button.addEventListener('click', () => {
-  lastPickedColor = userInput.value;
-  listItem = document.querySelectorAll('li');
-   for(let i = 0; i < listItem.length; i++) {
-    listItem[i].style.color = lastPickedColor;
+  $('#js-shopping-list-form').on('submit', ev => {
+    ev.preventDefault();
+    const inputText = $('#shopping-list-entry').val()
+    if (!inputText) {
+      return alert('Please enter an item title!')
+    } else {
+      const item = {
+        title: inputText,
+        completed: false
+      }
+      STORE.items.unshift(item)
+      displayItems()
     }
-  p.innerHTML = 'The list colour is: ' + userInput.value;
-});
 
 
-addItemButton.addEventListener('click', () => {
-  let list = document.querySelector('ul');
-  let li = document.createElement('li');
-  li.textContent = addItemInput.value;
-  let appendedItem = list.appendChild(li);
-  li.style.color = lastPickedColor; // so it will add li with last picked color
-  for(let i = 0; i < appendedItem.length; i++) {
-    appendedItem[i].style.color = lastPickedColor;
-    } 
-  addItemInput.value = '';
-});
+  })
 
+  $('body').on('click', '.shopping-item-toggle', (ev => {
+    ev.preventDefault();
+    const clickedIndex = $(event.target).parents('.shopping-item-toggle').attr('data-id')
+    console.log(`toggle clicked on ${clickedIndex}`)
+    STORE.items[clickedIndex].completed = !STORE.items[clickedIndex].completed
+    displayItems()
 
+  }))
 
-removeItemButton.addEventListener('click', () => {
-  let list = document.querySelector('ul');
-  let li = document.querySelector('li:last-child');
-  list.removeChild(li);;
-});
-
-
-listDiv.addEventListener('mouseover', (event) => {
-  if(event.target.tagName == 'LI') {
-  event.target.style.textTransform = 'uppercase';
-  }
-});
-
-listDiv.addEventListener('mouseout', (event) => {
-  if(event.target.tagName == 'LI') {
-  event.target.style.textTransform = 'lowercase';
-  }
-});
+  displayItems()
+})
